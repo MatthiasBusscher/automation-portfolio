@@ -1,12 +1,12 @@
-# SaaS Metrics Engine (ARR / MRR / NRR)
+# Recurring Revenue Metrics Engine (ARR / MRR / NRR)
 
-> **Context** B2B services group with a large portfolio of recurring subscriptions · sole automation engineer
-> **Stack** Google Apps Script · Google Sheets (subscription database)
+> **Context** B2B facility services group (cleaning & security) · 60 recurring service contracts · sole automation engineer
+> **Stack** Google Apps Script · Google Sheets (contracts database)
 > **Category** Finance automation & reporting
 
 ## The problem
 
-Management needed monthly visibility on recurring-revenue health: ARR, MRR, New MRR, and NRR. Producing these numbers meant 3-5 hours of manual exports and spreadsheet arithmetic each month for 60 active subscriptions.Worse, historical subscription data was fragmented — some months simply had no recorded snapshot — so growth metrics like NRR could not be calculated reliably. Reports were late, error-prone, and management was always looking at stale numbers.
+Management needed monthly visibility on recurring-revenue health: ARR, MRR, New MRR, and NRR. The business sells cleaning and security services on recurring annual contracts — a revenue model that behaves like SaaS financially, but is tracked in a plain Sheets database rather than billing software. Producing these numbers meant 3–5 hours of manual exports and spreadsheet arithmetic each month across 60 active contracts. Worse, historical contract data was fragmented — some months simply had no recorded snapshot — so growth metrics like NRR could not be calculated reliably. Reports were late, error-prone, and management was always looking at stale numbers.
 
 ## Architecture
 
@@ -25,7 +25,8 @@ A scheduled Apps Script runs on the 1st of every month, reads the active subscri
 
 ## Key decisions & trade-offs
 
-- **Scheduled snapshot vs. on-demand calculation.** Metrics are computed and *stored* on the 1st of each month rather than recalculated live. SaaS metrics are point-in-time by definition — storing the snapshot makes historical numbers immutable and auditable, even if subscription records are later edited.
+- **Applying SaaS-style metrics to a services business.** ARR/MRR/NRR are standard SaaS metrics, but the underlying contracts here are annual facility service agreements — not software subscriptions. The same financial logic applies (predictable recurring revenue, churn, expansion), and using these metrics gave management a framework they recognized from modern business reporting, applied to a traditionally low-visibility operational business.
+- **Scheduled snapshot vs. on-demand calculation.** Metrics are computed and *stored* on the 1st of each month rather than recalculated live. Recurring-revenue metrics are point-in-time by definition — storing the snapshot makes historical numbers immutable and auditable, even if contract records are later edited.
 - **GAS + Sheets vs. a BI tool.** The subscription data already lived in the Google Workspace ecosystem and the team works in Sheets daily. A BI tool would have added licensing cost and a maintenance dependency for what is ultimately a deterministic monthly calculation.
 - **Reconstruct missing history instead of failing.** The alternative — refusing to compute metrics when a baseline month is missing — would have produced report gaps forever (the past can't be re-measured). Re-running the actual calculation against real subscription start dates was chosen over estimation because the data was always there; it just had never been snapshotted.
 - **NRR is month-over-month, not the traditional 12-month cohort metric.** The formula is `(current MRR − new MRR) / prior month MRR`. This sidesteps the 12-month historical lookback dependency entirely and was appropriate for the reporting cadence needed — simpler, and robust against the patchy historical data the system was designed to handle.
