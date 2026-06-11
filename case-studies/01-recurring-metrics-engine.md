@@ -1,6 +1,6 @@
 # Recurring Revenue Metrics Engine (ARR / MRR / NRR)
 
-> **Context** B2B facility services group (cleaning & security) · 60 recurring service contracts · sole automation engineer
+> **Context** B2B facility services group · 60 recurring service contracts · sole automation engineer
 > **Stack** Google Apps Script · Google Sheets (contracts database)
 > **Category** Finance automation & reporting
 
