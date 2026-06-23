@@ -1,12 +1,12 @@
 # Real Estate Enrichment: Address → m² (Kadaster BAG API)
 
-> **Context** Facility services & security · floor area (m²) is the core variable in every quote calculation
+> **Context** Facility services · floor area (m²) is a standard input in facility quoting
 > **Stack** Pipedrive · Make.com · PDOK Locatieserver · Kadaster BAG API
 > **Category** Data enrichment & geo-API integration
 
 ## The problem
 
-Quoting facility work starts with the building's floor area. Account managers looked m² up manually in public registers for every request — slow, and dangerously imprecise: an overestimated area prices you out of the deal, an underestimated one wins you a contract that loses money on every visit. Compounding it, addresses in the CRM were free-text and messy (country suffixes, commas, typos), so even careful lookups started from bad input. The fix had to be autonomous and anchored to an official source.
+Quoting facility work commonly starts with the building's floor area. Account managers looked m² up manually in public registers for every request — slow, and dangerously imprecise: an overestimated area prices you out of the deal, an underestimated one wins you a contract that loses money on every visit. Compounding it, addresses in the CRM were free-text and messy (country suffixes, commas, typos), so even careful lookups started from bad input. The fix had to be autonomous and anchored to an official source.
 
 ## Architecture
 
