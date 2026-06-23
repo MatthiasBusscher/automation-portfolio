@@ -43,6 +43,18 @@ The internal-recharging routing. A service sold to a client by the parent entity
 - New products are available to sales and administration immediately after a single entry.
 - The internal-recharging structure (parent ↔ sub-entity) is created correctly every time, without anyone having to remember the routing rules.
 
+## Evolution: product group data moved out of Make (cost & maintainability)
+
+The original sync resolved each product's group via a **per-record lookup against a Make.com data store** — costing Make operations on every record, and meaning product groups could only be maintained inside the Make platform.
+
+The reference data was relocated into the product database. Product groups now live in a dedicated sheet keyed by a **category code** — the same code carried on the product records and written to the logbook sheet. During the run, the Apps Script matches on the category code across these sheets, resolves the correct product group ID, and includes it directly in the payload sent to the Make webhook. Make no longer performs any data store lookup.
+
+**Result:**
+- The per-record data store lookup is eliminated, lowering recurring Make operations cost.
+- A new product group is added by editing a sheet instead of the Make data store — accessible to non-technical staff, and consistent with the config-driven approach used across the rest of the system.
+
+**What I'd add:** validation on the category code (check against an allowed list) so a typo in the sheet can't pass an invalid group through the sync.
+
 ## Limitations & what I'd do differently
 
 - The sync is one-directional. If someone edits a product directly in Pipedrive or WeFact, the change silently diverges until the next sync overwrites it there's no conflict detection. Locking down edit rights in the consumer systems was the pragmatic mitigation.
