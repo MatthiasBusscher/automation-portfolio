@@ -6,7 +6,7 @@
 
 ## The problem
 
-When a deal hit "Signed" in the CRM, someone had to retype the customer into the invoicing system (WeFact) as a debtor — company name, KvK number, billing address — before the first invoice could go out. At 1–2 signed deals per month, each delay and each typo had direct revenue impact. Two technical constraints shaped the solution: polling the CRM for changes would burn API quota continuously for rare events, and existing customers signing a *new* deal must not become duplicate debtors.
+When a deal hit "Signed" in the CRM, someone had to retype the customer into the invoicing system (WeFact) as a debtor — company name, KvK number, billing address — before the first invoice could go out. At a low volume of high-value deals, each delay and each typo had direct revenue impact. Two technical constraints shaped the solution: polling the CRM for changes would burn API quota continuously for rare events, and existing customers signing a *new* deal must not become duplicate debtors.
 
 ## Architecture
 
