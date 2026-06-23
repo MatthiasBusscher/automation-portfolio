@@ -1,12 +1,12 @@
 # Recurring Revenue Metrics Engine (ARR / MRR / NRR)
 
-> **Context** B2B facility services group · 60 recurring service contracts · sole automation engineer
+> **Context** B2B facility services group (cleaning & security) · recurring service contracts · sole automation engineer
 > **Stack** Google Apps Script · Google Sheets (contracts database)
 > **Category** Finance automation & reporting
 
 ## The problem
 
-Management needed monthly visibility on recurring-revenue health: ARR, MRR, New MRR, and NRR. The business sells cleaning and security services on recurring annual contracts — a revenue model that behaves like SaaS financially, but is tracked in a plain Sheets database rather than billing software. Producing these numbers meant 3–5 hours of manual exports and spreadsheet arithmetic each month across 60 active contracts. Worse, historical contract data was fragmented — some months simply had no recorded snapshot — so growth metrics like NRR could not be calculated reliably. Reports were late, error-prone, and management was always looking at stale numbers.
+Management needed monthly visibility on recurring-revenue health: ARR, MRR, New MRR, and NRR. The business sells cleaning and security services on recurring annual contracts — a revenue model that behaves like SaaS financially, but is tracked in a plain Sheets database rather than billing software. Producing these numbers meant 3–5 hours of manual exports and spreadsheet arithmetic each month across the active contract base. Worse, historical contract data was fragmented — some months simply had no recorded snapshot — so growth metrics like NRR could not be calculated reliably. Reports were late, error-prone, and management was always looking at stale numbers.
 
 ## Architecture
 
