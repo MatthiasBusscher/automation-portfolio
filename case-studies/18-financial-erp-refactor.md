@@ -16,7 +16,7 @@ flowchart LR
     LOCK --> WRITE[("Sheets ERP database<br/>(subscriptions, invoice lines)")]
     WRITE --> SPLIT{"Line-item SKU filter"}
     SPLIT -- "client sales" --> WF["sendToWeFact:<br/>dynamic invoice terms,<br/>Base64 contract attachments"]
-    SPLIT -- "internal recharging" --> INT["Inter-entity invoice flow<br/>(sub-entity → parent)"]
+    SPLIT -- "internal recharging" --> INT["Inter-entity invoice flow"]
     DATES["calculateNextDate:<br/>string-based date engine<br/>(YYYY-MM-DD, no TZ drift)"] -.-> WRITE
     ALL["Every step"] -.-> LOG[("Try/catch + traceable<br/>system log")]
 ```
@@ -38,7 +38,7 @@ Diagnosing the race condition. Intermittent, load-dependent data loss in a syste
 ## Results
 
 - Ingestion data loss eliminated: concurrent API requests can no longer overwrite each other, regardless of arrival timing.
-- Internal recharging between parent and sub-entities runs autonomously — recognized by SKU, invoiced without manual bookings.
+- Internal recharging between entities runs autonomously — recognized by SKU, invoiced without manual bookings.
 - Recurring invoice dates are deterministic across timezone and DST boundaries; the month-drift class of billing errors is gone.
 - A previously unstable, unmaintainable codebase is now modular and traceable: every transaction leaves an audit log, and failures degrade gracefully instead of halting invoicing.
 
