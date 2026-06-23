@@ -1,12 +1,12 @@
 # Multi-Entity Cost Center Automation (Pipedrive → Exact Online)
 
-> **Context** Facility/multi-services group · staff paid from sub-entities, client invoiced from the parent — profitability tracked per object via cost centers
+> **Context** Multi-entity services group · costs and revenue split across separate Exact administrations — profitability tracked per object via cost centers
 > **Stack** Pipedrive · Make.com · Exact Online API (raw HTTP, OAuth2 from the [token management system](03-oauth2-token-management.md))
 > **Category** Finance automation & ERP integration
 
 ## The problem
 
-Knowing whether a project or object is profitable requires linking purchasing (hours, from the sub-entity's books) and sales (client invoices, from the parent's books) to the same cost center (object code) in Exact Online. Every new job meant finance manually creating that cost center **twice** — once in the parent administration, once in the executing sub-entity's administration — with names that had to match exactly. Skipped or mistyped cost centers meant hours couldn't be recharged correctly and management lost sight of per-object profitability.
+Knowing whether a project or object is profitable requires linking purchasing (hours) and sales (client invoices) to the same cost center (object code) in Exact Online — across two separate administrations. Every new job meant finance manually creating that cost center **twice** — once in each administration — with names that had to match exactly. Skipped or mistyped cost centers meant hours couldn't be recharged correctly and management lost sight of per-object profitability.
 
 ## Architecture
 
