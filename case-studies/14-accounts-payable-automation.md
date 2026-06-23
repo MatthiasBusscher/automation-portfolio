@@ -1,12 +1,12 @@
 # Accounts Payable Automation & Intelligent Routing
 
-> **Context** Financial administration for 13+ entities · ~100–150 invoices per month across all entities
+> **Context** Financial administration for 13+ entities · a high monthly volume of supplier invoices
 > **Stack** Google Apps Script · Google Drive · Gmail API · Basecone/WeFact (per-entity intake addresses) · Sheets ("Betaallijst" payment list)
 > **Category** Finance automation — accounts payable
 
 ## The problem
 
-AP processing was a manual conveyor belt: download PDFs from various folders, retype them into the central payment list, forward them to the processing software (Basecone) — per entity, hundreds of times a week. The hidden killer was **dunning letters**: payment reminders arriving as PDFs look exactly like invoices, and were regularly processed as *new* invoices — cluttering the administration and creating genuine double-payment risk. And one requirement was absolute: if anything in the chain fails, an invoice may never silently disappear into the cloud.
+AP processing was a manual conveyor belt: download PDFs from various folders, retype them into the central payment list, forward them to the processing software (Basecone) — per entity, repeatedly, every week. The hidden killer was **dunning letters**: payment reminders arriving as PDFs look exactly like invoices, and were regularly processed as *new* invoices — cluttering the administration and creating genuine double-payment risk. And one requirement was absolute: if anything in the chain fails, an invoice may never silently disappear into the cloud.
 
 ## Architecture
 
