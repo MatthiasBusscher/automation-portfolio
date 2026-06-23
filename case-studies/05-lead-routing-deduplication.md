@@ -6,7 +6,7 @@
 
 ## The problem
 
-Speed-to-lead decides deals, but website submissions (Webflow) were being retyped into the CRM (Pipedrive) by hand — at roughly 2–3 leads per week, each waiting hours to days for manual entry, occasionally missed entirely. The naive fix (a standard form→CRM integration) creates a worse problem: it pushes every submission blindly, so existing customers who fill in a new form become *duplicate* organizations and contacts. The CRM was already polluted with duplicates, and sales was losing sight of customer history.
+Speed-to-lead decides deals, but website submissions (Webflow) were being retyped into the CRM (Pipedrive) by hand — at low inbound volume, each lead waiting hours to days for manual entry, occasionally missed entirely. The naive fix (a standard form→CRM integration) creates a worse problem: it pushes every submission blindly, so existing customers who fill in a new form become *duplicate* organizations and contacts. The CRM was already polluted with duplicates, and sales was losing sight of customer history.
 
 ## Architecture
 
