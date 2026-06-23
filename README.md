@@ -11,7 +11,7 @@
 ### 💶 Finance & ERP
 | # | Case study | Stack | Headline result |
 |---|-----------|-------|-----------------|
-| <a id="case-01"></a>01 | [Recurring Revenue Metrics Engine (ARR/MRR/NRR)](case-studies/01-saas-metrics-engine.md) | GAS, Sheets | Monthly KPI reporting reduced from hours of manual work to zero |
+| <a id="case-01"></a>01 | [Recurring Revenue Metrics Engine (ARR/MRR/NRR)](case-studies/01-recurring-metrics-engine.md) | GAS, Sheets | Monthly KPI reporting reduced from hours of manual work to zero |
 | <a id="case-06"></a>06 | [Order-to-Cash: Automated Debtor Creation](case-studies/06-order-to-cash-automation.md) | Pipedrive, Make, WeFact | Signed deal → invoice-ready debtor in ~1 second |
 | <a id="case-07"></a>07 | [Multi-Entity Cost Center Automation](case-studies/07-multi-entity-cost-centers.md) | Make, Exact Online API | Cost centers created across multiple administrations, automatically |
 | <a id="case-14"></a>14 | [Accounts Payable Automation](case-studies/14-accounts-payable-automation.md) | GAS, Basecone | Incoming invoices classified, deduplicated, and routed zero-touch |
