@@ -1,6 +1,6 @@
 # Enterprise Document Management App (Config-Driven GAS)
 
-> **Context** Umbrella organization, 13+ entities · daily inflow of critical mail and tax authority correspondence via Drive
+> **Context** Umbrella organization, a multi-entity group · daily inflow of critical mail and tax authority correspondence via Drive
 > **Stack** Google Apps Script · Google Sheets (logbook + config) · Drive · Gmail (HTML digests)
 > **Category** Internal application development
 
