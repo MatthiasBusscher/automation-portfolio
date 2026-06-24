@@ -6,7 +6,7 @@
 
 ## The problem
 
-Every new or changed product had to be entered manually in three places: the central product database, the CRM (Pipedrive), and the invoicing system (WeFact). With no single source of truth, sales quoted from outdated catalogs and invoices went out with wrong names or prices. Product changes accured by default twice a year or when price changes where communicated by suppliers. The entity structure added real complexity: *service* products needed to exist in both the parent entity and the executing sub-entity (for internal recharging), while *delivery* products belonged to the parent entity only. Keeping that straight by hand was unrealistic.
+Every new or changed product had to be entered manually in three places: the central product database, the CRM (Pipedrive), and the invoicing system (WeFact). With no single source of truth, sales quoted from outdated catalogs and invoices went out with wrong names or prices. Product changes accured by default twice a year or when price changes where communicated by suppliers. The entity structure added real complexity: some product types needed to exist in multiple administrations at once, while others belonged to a single administration. Keeping that straight by hand was unrealistic.
 
 ## Architecture
 
@@ -18,8 +18,8 @@ flowchart LR
     SEARCH -- yes --> UPD["Update (upsert)"]
     SEARCH -- no --> CREATE["Create"]
     UPD & CREATE --> ROUTE{"Product type?"}
-    ROUTE -- "service" --> BOTH["WeFact: parent +<br/>sub-entity (recharging)"]
-    ROUTE -- "delivery" --> PARENT["WeFact: parent only"]
+    ROUTE -- "type A" --> BOTH["WeFact: multiple<br/>administrations"]
+    ROUTE -- "type B" --> PARENT["WeFact: single<br/>administration"]
     MAKE --> PD["Pipedrive catalog"]
 ```
 
@@ -30,18 +30,18 @@ A change in the central product database fires a GAS webhook into Make.com. The 
 - **One designated master.** The product database is the only place where products are created or edited; CRM and invoicing are read-only consumers. This deliberately sacrifices flexibility (sales can't add ad-hoc products in Pipedrive) to guarantee consistency — the precise failure mode we were eliminating.
 - **Upsert instead of create-only.** Idempotent sync: replaying an event or re-syncing a product can never produce duplicates. This made the flow safe to re-run after partial failures.
 - **Webhook from the database vs. Make polling the sheet.** Push keeps latency near-zero and avoids burning Make operations on empty polls; the GAS side already had an edit-log to hook into.
-- **Routing logic in the flow, not in the data.** Product type (service vs. delivery) drives entity routing centrally in Make. The alternative — flagging target entities per product in the database — was rejected as one more manual field to get wrong.
+- **Routing logic in the flow, not in the data.** Product type drives administration routing centrally in Make. The alternative — flagging target administrations per product in the database — was rejected as one more manual field to get wrong.
 
 ## The hardest part
 
-The internal-recharging routing. A service sold to a client by the parent entity is *executed* by a sub-entity, which must invoice the parent internally — so the same product needs to exist, with consistent identifiers, in two WeFact administrations at once. Getting the create/update logic idempotent across *both* administrations (where one might already have the product and the other not) required checking and branching per administration rather than treating "WeFact" as a single target.
+Multi-administration routing. Some products need to exist, with consistent identifiers, in more than one WeFact administration at once. Getting the create/update logic idempotent across *both* administrations (where one might already have the product and the other not) required checking and branching per administration rather than treating "WeFact" as a single target.
 
 ## Results
 
 - Invoicing errors from stale product names, prices, or wrong entities eliminated — invoices always reference the synced catalog.
 - Triple data entry across three systems removed entirely.
 - New products are available to sales and administration immediately after a single entry.
-- The internal-recharging structure (parent ↔ sub-entity) is created correctly every time, without anyone having to remember the routing rules.
+- The multi-administration product structure is created correctly every time, without anyone having to remember the routing rules.
 
 ## Evolution: product group data moved out of Make (cost & maintainability)
 

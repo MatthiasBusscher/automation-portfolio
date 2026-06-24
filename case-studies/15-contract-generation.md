@@ -1,12 +1,12 @@
 # Automated Contract Generation (HR Addendums)
 
-> **Context** Multi-entity HR (6+ entities, different CAOs, logos, legal details) · addendums for changed employment terms
+> **Context** Multi-entity HR (multiple entities, different CAOs, logos, legal details) · addendums for changed employment terms
 > **Stack** Google Forms · Google Sheets · Google Apps Script · Google Docs API (DOM manipulation)
 > **Category** Legal tech & document generation
 
 ## The problem
 
-Changed employment terms must be recorded in a legally correct addendum. In practice, HR copied an old employee's contract and overwrote it — with predictable results: leftover clauses from someone else's contract, wrong entity names or logos, empty gaps where optional terms didn't apply, and version drift as old templates kept circulating. Across 6+ entities with different collective agreements, the copy-paste method wasn't just sloppy — it was a legal liability.
+Changed employment terms must be recorded in a legally correct addendum. In practice, HR copied an old employee's contract and overwrote it — with predictable results: leftover clauses from someone else's contract, wrong entity names or logos, empty gaps where optional terms didn't apply, and version drift as old templates kept circulating. Across multiple entities with different collective agreements, the copy-paste method wasn't just sloppy — it was a legal liability.
 
 ## Architecture
 

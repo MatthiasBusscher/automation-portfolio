@@ -1,6 +1,6 @@
 # Automation Portfolio
 
-18 production automations I designed and built over 18 months as the sole automation engineer for a multi-entity B2B services group (multiple legal entitie, facility services & security). They cover the full back office: CRM, order-to-cash, accounts payable, ERP integration, HR compliance, and internal tooling.
+18 production automations I designed and built over 18 months as the sole automation engineer for a multi-entity B2B services group (multiple legal entities, facility services & security). They cover the full back office: CRM, order-to-cash, accounts payable, ERP integration, HR compliance, and internal tooling.
 
 **Stack:** Google Apps Script · Make.com · Pipedrive · WeFact · Exact Online · Basecone · Dutch government APIs (KvK, Kadaster BAG, PDOK)
 
