@@ -41,7 +41,7 @@
 | # | Case study | Stack | Headline result |
 |---|-----------|-------|-----------------|
 | <a id="case-08"></a>08 | [Field Service Reporting Tool](case-studies/08-field-service-reporting.md) | GAS, Sheets, Drive | One-click daily PDF reports for field personnel |
-| <a id="case-11"></a>11 | [Enterprise Document Management](case-studies/11-document-management-app.md) | GAS, config-driven | Incoming mail logged, tagged, and chased across 13+ entities |
+| <a id="case-11"></a>11 | [Enterprise Document Management](case-studies/11-document-management-app.md) | GAS, config-driven | Incoming mail logged, tagged, and chased across multiple entities |
 | <a id="case-12"></a>12 | [GDPR-Compliant HR Document Pipeline](case-studies/12-hr-document-compliance.md) | GAS, Drive | Sensitive HR docs classified and audited, privacy by design |
 | <a id="case-15"></a>15 | [Automated Contract Generation](case-studies/15-contract-generation.md) | Forms, GAS, Docs | HR addendum from form input in ~30 seconds, legally consistent |
 | <a id="case-16"></a>16 | [Work Schedule Configurator](case-studies/16-work-schedule-configurator.md) | GAS, Sheets UI | Cascading-filter configurator inside a spreadsheet |
