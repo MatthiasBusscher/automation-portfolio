@@ -1,6 +1,6 @@
 # Accounts Payable Automation & Intelligent Routing
 
-> **Context** Financial administration for 13+ entities · a high monthly volume of supplier invoices
+> **Context** Financial administration for a multi-entity group · a high monthly volume of supplier invoices
 > **Stack** Google Apps Script · Google Drive · Gmail API · Basecone/WeFact (per-entity intake addresses) · Sheets ("Betaallijst" payment list)
 > **Category** Finance automation — accounts payable
 
