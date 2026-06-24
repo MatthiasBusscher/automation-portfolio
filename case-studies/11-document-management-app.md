@@ -6,7 +6,7 @@
 
 ## The problem
 
-Critical post for 13+ entities landed across dozens of Drive folders with no central overview: who needs to read which letter, what follow-up actions exist, and were they done? Beyond the workflow problem sat an architectural one: entity names change, new entities get founded, folder structures move. If all of that is hardcoded, every organizational change needs a developer — making the system itself the bottleneck it was meant to remove.
+Critical post for multiple entities landed across dozens of Drive folders with no central overview: who needs to read which letter, what follow-up actions exist, and were they done? Beyond the workflow problem sat an architectural one: entity names change, new entities get founded, folder structures move. If all of that is hardcoded, every organizational change needs a developer — making the system itself the bottleneck it was meant to remove.
 
 ## Architecture
 
