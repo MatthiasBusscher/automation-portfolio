@@ -1,7 +1,7 @@
 # Multi-Form Lead Routing, Qualification & CRM Deduplication
 
 > **Context** B2B sales operation · multiple inbound website forms  
-> **Stack** Website forms · Make.com · Pipedrive · email marketing platform · structured fallback storage  
+> **Stack** Website forms · workflow automation · CRM · marketing/follow-up platform · structured fallback storage
 > **Category** CRM automation & sales operations
 
 ## The problem
@@ -111,6 +111,6 @@ This reduced duplicated logic while allowing new forms and follow-up requirement
 
 - **Qualification rules were embedded in workflow logic.** I would move them into a governed configuration layer and cover them with decision-table tests.
 
-- **Cross-platform actions were not one atomic transaction.** A coded implementation could use persistent event storage, idempotency keys and replayable background jobs to improve recovery across CRM, notification and marketing systems.
+- **Cross-platform actions could not be guaranteed as one transaction.** A coded implementation could use persistent event storage, idempotency keys and replayable background jobs to improve recovery across connected systems.
 
 - **Marketing segmentation requires explicit data-governance rules.** Consent status, retention periods and unsubscribe behaviour should be handled and documented consistently.
