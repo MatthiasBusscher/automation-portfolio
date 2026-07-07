@@ -35,7 +35,7 @@ The SBI data shape. The basisprofiel returns activities as a nested array of var
 ## Results
 
 - Data entry for organizations reduced to one field: the KvK number. The system fills in the rest.
-- Invoice-blocking data issues (wrong legal names, missing registered addresses) eliminated at the source — records are government-verified before the deal ever closes.
+- Invoice-blocking data issues such as wrong legal names or missing registered addresses are reduced by checking records against a public source before the deal closes.
 - Multi-activity companies get complete, readable industry profiles in the CRM, improving segmentation.
 - API usage is strictly proportional to actual data changes.
 

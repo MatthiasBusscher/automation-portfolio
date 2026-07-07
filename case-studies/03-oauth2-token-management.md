@@ -21,7 +21,7 @@ flowchart LR
     DS -. "valid tokens" .-> CONSUMERS["All Exact integrations<br/>(cost centers, sync, …)"]
 ```
 
-A custom app registered in the Exact App Store provides the OAuth2 client. After a one-time manual authorization, a scheduled Make scenario owns the token lifecycle: read the stored refresh token, exchange it for a fresh pair before expiry, and atomically overwrite the Data Store so every consumer scenario always finds valid credentials.
+A custom app registered in the finance platform provides the OAuth2 client. After a one-time manual authorization, a scheduled workflow owns the token lifecycle: read the stored refresh token, exchange it for a fresh pair before expiry, and overwrite the credential store so consumer workflows can keep using valid credentials.
 
 ## Key decisions & trade-offs
 
@@ -37,7 +37,7 @@ The initial token capture. The first refresh token issued during app authorizati
 
 - Exact Online integrations run uninterrupted no broken connections from expired tokens since deployment.
 - No hardcoded tokens anywhere; credentials live in one access-restricted store.
-- Manual re-authentication eliminated; token management requires zero recurring attention.
+- Manual re-authentication effort was reduced; token management requires less recurring attention.
 
 ## Limitations & what I'd do differently
 

@@ -1,6 +1,6 @@
 # Recurring Revenue Metrics Engine (ARR / MRR / NRR)
 
-> **Context** B2B services group · recurring service contracts · sole automation engineer
+> **Context** Back-office services group · recurring service contracts
 > **Stack** Google Apps Script · Google Sheets (contracts database)
 > **Category** Finance automation & reporting
 
@@ -21,25 +21,25 @@ flowchart LR
     CALC --> OUT[("KPI report<br/>(Sheets)")]
 ```
 
-A scheduled Apps Script runs on the 1st of every month, reads the active subscription database, and computes the full KPI set. When a historical month is missing, the engine does not estimate or interpolate — it recalculates exactly. The function accepts a historical `overrideDate` and re-runs the full calculation against the live subscription database, filtering by each subscription's `Startdatum`: only contracts started on or before the last day of the target month are counted. A `genereerHistorie()` function calls this for each missing month in sequence, producing rows that are mathematically identical to what a live run would have produced at the time. This works correctly as long as the subscription database still contains the historical start dates — deleted or backdated records would silently affect reconstructed figures.
+A scheduled Apps Script runs on the 1st of every month, reads the active subscription database, and computes the full KPI set. When a historical reporting period was missing, the engine rebuilt prior-period snapshots from the available contract records rather than relying on manual estimates. The reconstruction logic reused the same calculation path as the scheduled report and filtered records according to their effective start period. This made the historical series more consistent, while still depending on the quality and completeness of the underlying source data.
 
 ## Key decisions & trade-offs
 
 - **Applying SaaS-style metrics to a services business.** ARR/MRR/NRR are standard SaaS metrics, but the underlying contracts here are recurring service agreements — not software subscriptions. The same financial logic applies (predictable recurring revenue, churn, expansion), and using these metrics gave management a framework they recognized from modern business reporting, applied to a traditionally low-visibility operational business.
-- **Scheduled snapshot vs. on-demand calculation.** Metrics are computed and *stored* on the 1st of each month rather than recalculated live. Recurring-revenue metrics are point-in-time by definition — storing the snapshot makes historical numbers immutable and auditable, even if contract records are later edited.
+- **Scheduled snapshot vs. on-demand calculation.** Metrics are computed and *stored* on the 1st of each month rather than recalculated live. Recurring-revenue metrics are point-in-time by definition — storing the snapshot made historical reporting easier to compare and review, even if source records were later edited.
 - **GAS + Sheets vs. a BI tool.** The subscription data already lived in the Google Workspace ecosystem and the team works in Sheets daily. A BI tool would have added licensing cost and a maintenance dependency for what is ultimately a deterministic monthly calculation.
 - **Reconstruct missing history instead of failing.** The alternative — refusing to compute metrics when a baseline month is missing — would have produced report gaps forever (the past can't be re-measured). Re-running the actual calculation against real subscription start dates was chosen over estimation because the data was always there; it just had never been snapshotted.
 - **NRR is month-over-month, not the traditional 12-month cohort metric.** The formula is `(current MRR − new MRR) / prior month MRR`. This sidesteps the 12-month historical lookback dependency entirely and was appropriate for the reporting cadence needed — simpler, and robust against the patchy historical data the system was designed to handle.
 
 ## The hardest part
 
-Defining NRR correctly against fragmented history. NRR compares today's revenue from a cohort against that same cohort a year ago — but if the year-ago snapshot never existed, there is nothing to compare against. The fix was to make the engine self-healing: each run it detects gaps in the KPI history and backfills them from prior months before computing current metrics, so one missing month no longer poisons every future NRR calculation.
+The hardest part was defining a useful recurring-revenue health metric despite incomplete historical snapshots. A traditional cohort-based retention metric would have required a reliable historical baseline that did not always exist. The implemented approach therefore focused on producing a consistent month-over-month reporting series from the available data, while making the historical reconstruction limitations explicit.
 
 ## Results
 
-- Manual monthly reporting effort reduced to zero — the report is ready on the 1st, before anyone asks.
-- Calculation errors from manual spreadsheet work eliminated; metrics are derived directly from the subscription database by one tested code path.
-- Gaps in historical KPI data are detected and repaired automatically.
+- Manual monthly reporting effort was significantly reduced through scheduled report generation.
+- Calculation errors from manual spreadsheet work were reduced; metrics are derived directly from the subscription database by one calculation path.
+- Gaps in historical KPI data are detected and can be rebuilt from the available source records.
 - Management has a consistent, month-over-month comparable KPI series for the first time.
 
 ## Limitations & what I'd do differently

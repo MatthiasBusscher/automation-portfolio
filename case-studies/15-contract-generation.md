@@ -1,12 +1,12 @@
 # Automated Contract Generation (HR Addendums)
 
-> **Context** Multi-entity HR · addendums for changed employment terms
+> **Context** HR document workflow · addendums for changed employment terms
 > **Stack** Google Forms · Google Sheets · Google Apps Script · Google Docs API (DOM manipulation)
 > **Category** Legal tech & document generation
 
 ## The problem
 
-Changed employment terms must be recorded in a legally correct addendum. In practice, HR copied an old employee's contract and overwrote it — with predictable results: leftover clauses from someone else's contract, wrong entity names or logos, empty gaps where optional terms didn't apply, and version drift as old templates kept circulating. Across multiple entities with different collective agreements, the copy-paste method wasn't just sloppy — it was a legal liability.
+Changed employment terms must be recorded consistently. In practice, HR copied an old employee's contract and overwrote it — with predictable results: leftover clauses from someone else's contract, wrong organization names or logos, empty gaps where optional terms didn't apply, and version drift as old templates kept circulating. Across a changing template set, the copy-paste method created avoidable document risk.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ Changed employment terms must be recorded in a legally correct addendum. In prac
 flowchart LR
     FORM["Google Form:<br/>changed variables +<br/>entity selection"] --> SHEET[("Response sheet")]
     SHEET --> GAS["GAS generation engine"]
-    GAS --> TPL["getTemplateFile:<br/>select current template<br/>for chosen entity"]
+    GAS --> TPL["Template selector:<br/>select current template<br/>for chosen category"]
     TPL --> COPY["Copy template"]
     COPY --> FILL["Populate {{placeholders}}"]
     FILL --> DOM["DOM cleanup: remove<br/>whole elements for<br/>empty optional clauses<br/>(removeFromParent)"]
@@ -22,13 +22,13 @@ flowchart LR
     CLEAN --> OUT["Finished addendum"]
 ```
 
-HR fills in a form — only the *changed* employment variables plus the entity — and the engine does the rest: select the entity's current master template, copy it, populate placeholders, and structurally remove every optional clause that wasn't filled in.
+HR fills in a form — only the *changed* employment variables plus the relevant category — and the engine does the rest: select the current master template, copy it, populate placeholders, and structurally remove every optional clause that wasn't filled in.
 
 ## Key decisions & trade-offs
 
-- **Form as the only input surface.** HR never touches the document during generation; the human contribution is reduced to validated form fields. This is what actually eliminates the copy-paste error class — not better templates, but removing the opportunity to edit one.
-- **One master template per entity, resolved at runtime.** `getTemplateFile` always picks the *current* template for the selected entity. Legal updates a template once; every future addendum is automatically on the new version. No distribution problem, no stale copies in personal folders.
-- **DOM-level clause removal vs. find-and-replace.** Standard merge tools replace `{{placeholder}}` with an empty string, leaving broken sentences and gaps. This engine walks the document structure: if an optional clause is absent, it finds the placeholder's *parent element* (paragraph or list item) and removes it entirely (`removeFromParent`), then sweeps remaining blank lines. Unfilled options become invisible, not ugly.
+- **Form as the only input surface.** HR does not edit the document during generation; the human contribution is reduced to validated form fields. This is what reduces the copy-paste error class — not better templates, but removing the opportunity to edit one.
+- **One master template per category, resolved at runtime.** The template selector picks the current template for the selected category. Template owners update a template once; future documents use the new version. No distribution problem, no stale copies in personal folders.
+- **Structural clause removal vs. find-and-replace.** Standard merge tools replace `{{placeholder}}` with an empty string, leaving broken sentences and gaps. This engine walks the document structure: if an optional clause is absent, it finds the relevant parent element and removes it through the document API, then sweeps remaining blank lines. Unfilled options become invisible, not ugly.
 - **Sheets as the audit log for free.** Every generated addendum's inputs persist as a form response row — who requested what change, when, for which entity.
 
 ## The hardest part
@@ -37,10 +37,10 @@ Safe structural deletion. Removing "the element containing this placeholder" is 
 
 ## Results
 
-- The "someone else's data left in the contract" error class is gone — every addendum starts from a clean, current, entity-correct template.
+- The "someone else's data left in the contract" error class is reduced because every addendum starts from a clean, current template.
 - Documents are presentation-clean regardless of which options apply: no gaps, no orphaned clauses, no double blank lines.
-- Drafting time per addendum reduced from manual typing and formatting to near-instant form-driven generation.
-- Template management is centralized: legal edits once, effective immediately for all entities and users.
+- Drafting time per addendum is reduced through form-driven generation.
+- Template management is centralized: template owners edit once, with changes available to the relevant users.
 
 ## Limitations & what I'd do differently
 

@@ -1,12 +1,12 @@
 # Multi-Administration Cost Center Automation (Pipedrive → Exact Online)
 
-> **Context** Multi-administration finance setup · operational and financial records need consistent object-level tracking across administrations
+> **Context** Connected finance setup · operational and financial records need consistent object-level tracking
 > **Stack** Pipedrive · Make.com · Exact Online API (raw HTTP, OAuth2 from the [token management system](03-oauth2-token-management.md))
 > **Category** Finance automation & ERP integration
 
 ## The problem
 
-Reliable object-level reporting requires related operational and financial records to share the same cost center (object code) in Exact Online across multiple administrations. Every new object meant finance manually creating that cost center more than once, with names that had to match exactly. Skipped or mistyped cost centers meant downstream reporting and allocation became unreliable.
+Reliable object-level reporting requires related operational and financial records to share the same cost center structure across connected finance administrations. Every new object meant finance manually creating matching records more than once, with names that had to stay consistent. Skipped or mistyped cost centers meant downstream reporting and allocation became unreliable.
 
 ## Architecture
 
@@ -27,19 +27,19 @@ A domino architecture: completion of the debtor-creation flow (which writes the 
 ## Key decisions & trade-offs
 
 - **Chained processes ("domino") vs. one mega-flow.** Each step (deal → debtor → cost centers) is a separate scenario triggered by the previous one's written-back result. This keeps every flow small, independently testable, and re-runnable — at the cost of the chain's state living in CRM fields rather than a single orchestrator. For this team size, debuggability won.
-- **CRM as the master for naming.** One object name entered in Pipedrive propagates to identical cost-center structures across multiple Exact administrations. The alternative (finance naming cost centers in Exact) was the status quo that produced mismatches.
+- **CRM as the master for naming.** One object name entered in the CRM propagates to matching cost-center structures across the required finance administrations. The alternative, finance naming cost centers directly in the finance system, was the status quo that produced mismatches.
 - **Check-then-create per administration.** Each administration is independent — one can already have the cost center while another does not. Treating "Exact" as one target would have made re-runs unsafe; per-administration idempotency makes the flow safe to fire twice.
-- **Raw HTTP over connector modules.** Exact's cost-center endpoints and multi-administration switching needed more control than the standard connector exposed; raw requests with manually managed tokens were the reliable path.
+- **Raw HTTP over connector modules.** The cost-center endpoints and administration switching needed more control than the standard connector exposed; raw requests with manually managed tokens were the reliable path.
 
 ## The hardest part
 
-Multi-administration authentication and routing. Every API call must target the right Exact *division* (administration) with a valid token — against tokens that rotate weekly via a separate system, and division IDs that differ per target administration. Composing this from stored tokens + division IDs from configuration, inside Make's HTTP modules, with per-administration existence checks, is where most of the engineering time went.
+Administration-specific authentication and routing. Every API call must target the right finance administration with a valid token. Composing this from stored authentication data and configuration, with per-administration existence checks, is where most of the engineering time went.
 
 ## Results
 
 - Reliable object-level reporting: related records land on the same cost center automatically, in each required administration.
 - The full chain — new deal → debtor → cost centers — runs without any manual finance work.
-- One name in the CRM produces an identical, correct data structure across multiple Exact Online administrations, every time.
+- One name in the CRM produces a matching data structure across the required finance administrations.
 - The correct object code is available in each required administration from day one, so downstream financial allocation works without manual correction.
 
 ## Limitations & what I'd do differently

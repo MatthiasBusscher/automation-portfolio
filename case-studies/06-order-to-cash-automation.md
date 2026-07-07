@@ -31,12 +31,12 @@ Pipedrive's own automation engine fires a webhook only when the required deal co
 
 ## The hardest part
 
-Field mapping at the boundary of two systems with different data models — making sure the KvK number, billing address, and contact details land in the right WeFact fields for every service type. Incomplete data never reached the integration: Pipedrive's stage gate configuration prevented deals from advancing to "Signed" without the required fields filled in, so validation happened in the CRM before the webhook ever fired.
+Field mapping at the boundary of two systems with different data models — making sure the business identifier, billing address, and contact details land in the right finance-system fields for every service type. Incomplete data was less likely to reach the integration because the CRM stage gate required key fields before the webhook fired.
 
 ## Results
 
 - Lead time from signed deal to invoice-ready debtor reduced from manual delay to near-instant automation.
-- Manual data entry and the associated typos in billing addresses and KvK numbers eliminated.
+- Manual data entry and the associated typos in billing addresses and business identifiers were reduced.
 - Significant API and platform load avoided by the push architecture — no polling overhead at all.
 - No duplicate debtors; CRM and bookkeeping stay linked 1-to-1 via the written-back debtor number.
 

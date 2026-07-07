@@ -1,33 +1,33 @@
 # Core Financial ERP Engine: Refactor & Concurrency Control
 
-> **Context** Central financial backend of the group — deal ingestion, invoice line generation, internal financial allocation — running on Google Sheets + GAS
+> **Context** Central financial backend — deal ingestion, invoice line generation, internal financial allocation — running on Google Sheets + GAS
 > **Stack** Google Apps Script · LockService · WeFact API · Make.com (ingestion side)
 > **Category** Software architecture, refactoring & ERP integration
 
 ## The problem
 
-The organization's de-facto ERP was a complex Sheets/GAS ecosystem that predated any architectural discipline — and it was failing structurally under load. The critical defect: **race conditions on ingestion.** When the CRM pushed two won deals near-simultaneously, two script instances both searched for "the last empty row" at the same moment and wrote to it — one deal overwrote the other, customer data was permanently lost, and invoicing stalled. On top of that: recurring-invoice renewal dates drifted by a month around timezone/DST boundaries, and the logic for internal financial allocation was too fragile to trust. This wasn't a greenfield build but the hardest kind of work: stabilizing a live financial system while it kept running.
+The organization's de-facto ERP was a complex Sheets/GAS ecosystem that predated any architectural discipline and was failing structurally under load. The critical defect: **race conditions on ingestion.** When the CRM pushed won deals near-simultaneously, script instances could both search for the next empty row at the same moment and write to it, creating overwrite risk and downstream invoicing issues. On top of that, recurring-invoice renewal dates drifted around timezone/DST boundaries, and the logic for internal financial allocation was too fragile to trust. This wasn't a greenfield build but the hardest kind of work: stabilizing a live financial system while it kept running.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    MAKE["Make.com ingestion<br/>(won deals, possibly<br/>concurrent)"] --> LOCK["handleNewImportData:<br/>lock.waitLock — transactional<br/>queue, strictly serialized"]
+    MAKE["Workflow ingestion<br/>(won deals, possibly<br/>concurrent)"] --> LOCK["Ingestion lock:<br/>serialized queue"]
     LOCK --> WRITE[("Sheets ERP database<br/>(subscriptions, invoice lines)")]
     WRITE --> SPLIT{"Line-item SKU filter"}
-    SPLIT -- "external billing" --> WF["sendToWeFact:<br/>dynamic invoice terms<br/>and attachments"]
+    SPLIT -- "external billing" --> WF["Finance API call:<br/>dynamic invoice terms<br/>and attachments"]
     SPLIT -- "internal allocation" --> INT["Internal financial<br/>allocation flow"]
-    DATES["calculateNextDate:<br/>string-based date engine<br/>(YYYY-MM-DD, no TZ drift)"] -.-> WRITE
+    DATES["String-based date engine<br/>(YYYY-MM-DD, reduced TZ drift)"] -.-> WRITE
     ALL["Every step"] -.-> LOG[("Try/catch + traceable<br/>system log")]
 ```
 
-The refactored engine serializes all ingestion through a `LockService` transactional queue, splits external billing from internal allocation by SKU at the line-item level, constructs WeFact API payloads dynamically, and computes recurring dates through a custom string-based date engine immune to timezone reinterpretation.
+The refactored engine serializes ingestion through a locking queue, splits external billing from internal allocation at the line-item level, constructs finance API payloads dynamically, and computes recurring dates through a custom string-based date engine that reduces timezone reinterpretation issues.
 
 ## Key decisions & trade-offs
 
-- **Serialize ingestion rather than redesign storage.** The textbook fix for last-empty-row races is a database with atomic appends — but migrating the live financial backend off Sheets was a multi-month project the organization couldn't absorb. `lock.waitLock` creates a transactional queue: each API ingestion waits until the previous write cycle completes. Throughput is bounded by the lock, which is irrelevant at this event rate, and data loss went to zero. Pragmatism with a documented upgrade path beats the perfect architecture you can't ship.
+- **Serialize ingestion rather than redesign storage.** The textbook fix for last-empty-row races is a database with atomic appends, but migrating the live financial backend off Sheets was a larger project the organization couldn't absorb at the time. A locking queue makes each API ingestion wait until the previous write cycle completes. Throughput is bounded by the lock, which was acceptable at this event rate, and overwrite risk was substantially reduced. Pragmatism with a documented upgrade path beats the perfect architecture you can't ship.
 - **Refactor in place vs. rewrite.** Nine interdependent scripts in production, feeding real invoices, with no test environment that fully mirrors them — a big-bang rewrite risked replacing known bugs with unknown ones. The refactor went function by function, hardening each path (locking, dates, payloads, error handling) while behavior stayed observable against live output.
-- **Dates as strings, deliberately.** The renewal-date drift came from `Date` objects being constructed in one timezone context and reinterpreted in another (GAS project TZ vs. spreadsheet TZ vs. DST transitions) — off-by-one-day errors that became off-by-one-*month* after period arithmetic. `calculateNextDate` treats dates as `YYYY-MM-DD` strings and does its own calendar arithmetic, locally interpreted, no `Date` round-trips. Less idiomatic, fully deterministic.
+- **Dates as strings, deliberately.** The renewal-date drift came from date objects being constructed in one timezone context and reinterpreted in another (script project timezone vs. spreadsheet timezone vs. DST transitions) — off-by-one-day errors that became off-by-one-*month* after period arithmetic. The date engine treats dates as `YYYY-MM-DD` strings and does its own calendar arithmetic, locally interpreted, without date-object round trips.
 - **SKU-driven routing for financial allocation.** Which lines follow the external billing path and which follow the internal allocation path is encoded in product SKUs — data the upstream flow already maintains — rather than in per-deal manual flags. The allocation flow became autonomous because its input signal already existed reliably.
 - **Failure containment everywhere.** Every external call sits in try/catch with a timestamped trace log; an external system failing degrades one transaction with an audit trail, instead of halting the administrative process.
 
@@ -37,10 +37,10 @@ Diagnosing the race condition. Intermittent, load-dependent data loss in a syste
 
 ## Results
 
-- Ingestion data loss eliminated: concurrent API requests can no longer overwrite each other, regardless of arrival timing.
+- Ingestion overwrite risk was reduced through serialized API handling.
 - Internal financial allocation runs autonomously — recognized by SKU and processed without manual bookings.
-- Recurring invoice dates are deterministic across timezone and DST boundaries; the month-drift class of billing errors is gone.
-- A previously unstable, unmaintainable codebase is now modular and traceable: every transaction leaves an audit log, and failures degrade gracefully instead of halting invoicing.
+- Recurring invoice date handling is more consistent across timezone and DST boundaries.
+- A previously unstable codebase is more modular and traceable: transactions leave audit logs, and failures degrade more gracefully instead of halting invoicing.
 
 ## Limitations & what I'd do differently
 
