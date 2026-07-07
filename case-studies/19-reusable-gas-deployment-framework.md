@@ -1,6 +1,6 @@
 # Reusable GitHub Actions Deployment Framework (GitHub → Apps Script)
 
-> **Context** Internal automation development across multiple repositories and developer identities  
+> **Context** Internal automation development across multiple repositories and developer identities
 > **Stack** GitHub Actions · Git · Google Apps Script · clasp  
 > **Category** CI/CD, developer tooling & deployment governance
 
