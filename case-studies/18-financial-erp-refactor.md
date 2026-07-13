@@ -1,49 +1,63 @@
-# Core Financial ERP Engine: Refactor & Concurrency Control
+# Subscription Billing Engine: Migration, Concurrency & Failure Control
 
-> **Context** Central financial backend — deal ingestion, invoice line generation, internal financial allocation — running on Google Sheets + GAS
-> **Stack** Google Apps Script · LockService · WeFact API · Make.com (ingestion side)
-> **Category** Software architecture, refactoring & ERP integration
+> **Context** Internal recurring-billing backend handling subscriptions, one-time work and invoice preparation
+> **Stack** Google Apps Script · Google Sheets · LockService · billing API · workflow automation platform
+> **Category** Software architecture, migration safety & financial automation
 
 ## The problem
 
-The organization's de-facto ERP was a complex Sheets/GAS ecosystem that predated any architectural discipline and was failing structurally under load. The critical defect: **race conditions on ingestion.** When the CRM pushed won deals near-simultaneously, script instances could both search for the next empty row at the same moment and write to it, creating overwrite risk and downstream invoicing issues. On top of that, recurring-invoice renewal dates drifted around timezone/DST boundaries, and the logic for internal financial allocation was too fragile to trust. This wasn't a greenfield build but the hardest kind of work: stabilizing a live financial system while it kept running.
+A live Sheets and Apps Script backend had grown into the operational bridge between sales handover and billing. It imported won deals, created subscription or job records, expanded product line-items, advanced recurring dates, prepared invoice cycles and sent approved work to a billing API. A header and schema migration exposed several risks at once: concurrent imports could target the same row, API-written rows did not reliably trigger spreadsheet events, partial writes could leave master records without invoice lines, and an uncertain billing response could be retried into a duplicate invoice.
+
+The requirement was not just to make the new workbook run. The migration had to preserve existing billing behavior while making failures visible and preventing unsafe automatic recovery.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    MAKE["Workflow ingestion<br/>(won deals, possibly<br/>concurrent)"] --> LOCK["Ingestion lock:<br/>serialized queue"]
-    LOCK --> WRITE[("Sheets ERP database<br/>(subscriptions, invoice lines)")]
-    WRITE --> SPLIT{"Line-item SKU filter"}
-    SPLIT -- "external billing" --> WF["Finance API call:<br/>dynamic invoice terms<br/>and attachments"]
-    SPLIT -- "internal allocation" --> INT["Internal financial<br/>allocation flow"]
-    DATES["String-based date engine<br/>(YYYY-MM-DD, reduced TZ drift)"] -.-> WRITE
-    ALL["Every step"] -.-> LOG[("Try/catch + traceable<br/>system log")]
+    FLOW["Sales handover workflow"] --> STAGE[("Import staging sheet")]
+    STAGE --> POLL["Cursor-backed polling trigger"]
+    POLL --> LOCK["Serialized import lock"]
+    LOCK --> SCHEMA["Schema resolver<br/>aliases + required headers"]
+    SCHEMA --> MASTER[("Subscription / job master")]
+    SCHEMA --> LINES[("Calculated invoice lines")]
+    MASTER & LINES --> BATCH["Locked daily batch<br/>lifecycle → cycles → invoices"]
+    BATCH --> STATE[("Invoice state + audit log")]
+    STATE --> BILL["Billing API"]
+    PREFLIGHT["Read-only preflight"] -.-> STAGE
+    PREFLIGHT -.-> MASTER
+    PREFLIGHT -.-> LINES
+    PREFLIGHT -.-> STATE
 ```
 
-The refactored engine serializes ingestion through a locking queue, splits external billing from internal allocation at the line-item level, constructs finance API payloads dynamically, and computes recurring dates through a custom string-based date engine that reduces timezone reinterpretation issues.
+The refactor introduced a shared schema layer that resolves old and new sheet names, maps header aliases to canonical fields and fails before writing when required columns are missing. Imports run through a persisted cursor and a script lock. Existing deals are checked for incomplete output and repaired instead of being blindly duplicated or skipped. The daily lifecycle, invoice-cycle generation and billing steps share one lock and propagate failures to an explicit state log.
 
 ## Key decisions & trade-offs
 
-- **Serialize ingestion rather than redesign storage.** The textbook fix for last-empty-row races is a database with atomic appends, but migrating the live financial backend off Sheets was a larger project the organization couldn't absorb at the time. A locking queue makes each API ingestion wait until the previous write cycle completes. Throughput is bounded by the lock, which was acceptable at this event rate, and overwrite risk was substantially reduced. Pragmatism with a documented upgrade path beats the perfect architecture you can't ship.
-- **Refactor in place vs. rewrite.** Nine interdependent scripts in production, feeding real invoices, with no test environment that fully mirrors them — a big-bang rewrite risked replacing known bugs with unknown ones. The refactor went function by function, hardening each path (locking, dates, payloads, error handling) while behavior stayed observable against live output.
-- **Dates as strings, deliberately.** The renewal-date drift came from date objects being constructed in one timezone context and reinterpreted in another (script project timezone vs. spreadsheet timezone vs. DST transitions) — off-by-one-day errors that became off-by-one-*month* after period arithmetic. The date engine treats dates as `YYYY-MM-DD` strings and does its own calendar arithmetic, locally interpreted, without date-object round trips.
-- **SKU-driven routing for financial allocation.** Which lines follow the external billing path and which follow the internal allocation path is encoded in product SKUs — data the upstream flow already maintains — rather than in per-deal manual flags. The allocation flow became autonomous because its input signal already existed reliably.
-- **Failure containment everywhere.** Every external call sits in try/catch with a timestamped trace log; an external system failing degrades one transaction with an audit trail, instead of halting the administrative process.
+- **Poll API-written rows instead of trusting spreadsheet change events.** Writes made through an external API do not reliably fire the edit or change triggers used by human edits. A short-interval time trigger processes rows after the persisted cursor. This adds a small delay but gives every imported row a deterministic path.
+- **Resolve schemas by names, not column positions.** Canonical field names, aliases and required-header checks allow the old and migrated layouts to coexist during rollout. The trade-off is a schema map that must be maintained deliberately whenever the workbook changes.
+- **Repair partial imports idempotently.** If a deal already has a master record, the importer verifies its invoice lines and calculated totals and restores missing output where possible. This is safer than both "skip existing" and "write everything again" after an interrupted run.
+- **Treat an ambiguous invoice response as a manual reconciliation event.** Once an invoice request may have reached the external system, the engine does not retry automatically. The cycle moves to a review-required state because a lost response can still represent a successful invoice. This sacrifices unattended recovery to avoid a financially worse duplicate.
+- **Validate formulas before advancing the queue.** Formula-owned output columns are preserved, sheet capacity is extended before writes, and the importer waits for required calculated values before committing the cursor. That couples the script to the workbook's calculation contract, but prevents incomplete lines from entering billing.
+- **Keep one global lock at the current volume.** Import and daily billing work are serialized because correctness matters more than throughput at this event rate. A database-backed queue would be the next step if volume made the lock a bottleneck.
+- **Separate migration parity from safety changes.** A written parity audit lists retained flows, intentional behavior changes and duplicate-environment acceptance tests. This makes it clear which differences are defect fixes rather than accidental migration drift.
 
 ## The hardest part
 
-Diagnosing the race condition. Intermittent, load-dependent data loss in a system with no debugger, minimal logging (initially), and triggers that execute invisibly server-side — the evidence was occasional missing customers, weeks after the fact. Reconstructing the failure (two instances, same empty row) from circumstantial evidence, then *reproducing it on purpose* with simulated concurrent webhooks to prove both the diagnosis and the fix, was the project's real engineering test. The lesson that stuck: in concurrent systems, "rarely" just means "eventually."
+The hardest part was defining safe behavior for every interruption point while preserving the business rules of a live financial process. A crash can happen after a master write, while formulas are calculating, after one of several invoices succeeds, or after the billing service accepts a request but before its response reaches the script. Those states cannot all be handled with a generic retry. The refactor therefore uses different recovery rules for local writes, calculated data and irreversible external side effects.
 
 ## Results
 
-- Ingestion overwrite risk was reduced through serialized API handling.
-- Internal financial allocation runs autonomously — recognized by SKU and processed without manual bookings.
-- Recurring invoice date handling is more consistent across timezone and DST boundaries.
-- A previously unstable codebase is more modular and traceable: transactions leave audit logs, and failures degrade more gracefully instead of halting invoicing.
+- Concurrent core processing is serialized, reducing same-row overwrite risk.
+- API-written imports are processed through a durable cursor rather than an unreliable spreadsheet event.
+- Partial imports can be detected and repaired without recreating complete deals.
+- Missing headers, invalid dates, unresolved formulas and inconsistent linked records fail before billing.
+- Ambiguous billing outcomes are held for reconciliation instead of being automatically retried.
+- Old and migrated workbook layouts can be validated through the same canonical schema layer.
+- Month-end date arithmetic and weekly, four-weekly, monthly, quarterly and annual frequencies follow one shared implementation.
 
 ## Limitations & what I'd do differently
 
-- Sheets remains the database: the lock fixes write races, but there are no real transactions, schema, or referential integrity. This system is the strongest argument in the portfolio for the move to a proper backend (Postgres + API), and is exactly the class of system my current fullstack training targets.
-- The global lock is a single throughput bottleneck — correct at this volume, but the first thing to shard if event rates grew significantly.
-- Test coverage was entirely behavioral — watching live invoice output after each change, with no automated harness. Today I'd extract the pure logic (date engine, payload construction, SKU filters) into unit-testable modules first, *then* refactor behind those tests; the date engine in particular is pure input/output logic that would be trivial to cover and where a bug is maximally expensive.
+- Sheets remains the datastore. Locking and validation reduce risk, but there are still no transactions, foreign keys or atomic multi-record commits. A relational database with an API and durable job queue is the long-term architecture.
+- The preflight and parity audit provide broad migration coverage, but the pure calculation and state-transition functions still need automated unit tests. Duplicate-environment acceptance testing remains necessary before production rollout.
+- Idempotent repair ends at the external billing boundary because that API flow has no application-controlled idempotency key. Ambiguous outcomes therefore require manual reconciliation.
+- The global lock is intentionally conservative. Higher event volume would require smaller lock scopes or queue partitioning rather than a longer timeout.

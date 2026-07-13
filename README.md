@@ -11,11 +11,11 @@ The examples describe architecture-level patterns, engineering decisions and les
 ### 💶 Finance & ERP
 | # | Case study | Stack | Headline result |
 |---|-----------|-------|-----------------|
-| <a id="case-01"></a>01 | [Recurring Revenue Metrics Engine (ARR/MRR/NRR)](case-studies/01-recurring-metrics-engine.md) | Custom scripts, spreadsheets | Manual reporting effort significantly reduced |
+| <a id="case-01"></a>01 | [Recurring Revenue Metrics Engine (ARR/MRR/Growth)](case-studies/01-recurring-metrics-engine.md) | Custom scripts, spreadsheets | Legacy and migrated KPI layouts supported through one calculation path |
 | <a id="case-06"></a>06 | [Order-to-Cash: Automated Debtor Creation](case-studies/06-order-to-cash-automation.md) | CRM, workflow automation, finance system | Signed deal data prepared for finance-system intake |
 | <a id="case-07"></a>07 | [Multi-Administration Cost Center Automation](case-studies/07-multi-entity-cost-centers.md) | Workflow automation, finance API | Structured records created across connected systems |
 | <a id="case-14"></a>14 | [Accounts Payable Automation](case-studies/14-accounts-payable-automation.md) | Custom scripts, document-processing system | Incoming invoices classified, deduplicated and routed with less manual handling |
-| <a id="case-18"></a>18 | [Core Financial ERP Engine: Refactor & Concurrency](case-studies/18-financial-erp-refactor.md) | Custom scripts, locking, finance API | Concurrency issues reduced through locking and queueing |
+| <a id="case-18"></a>18 | [Subscription Billing Engine: Migration, Concurrency & Failure Control](case-studies/18-financial-erp-refactor.md) | Custom scripts, locking, billing API | Partial imports and ambiguous billing outcomes moved into explicit recovery paths |
 
 ### 🔄 Master data & integration
 | # | Case study | Stack | Headline result |
@@ -51,6 +51,8 @@ The examples describe architecture-level patterns, engineering decisions and les
 
 - **Event-driven design** — workflows trigger from meaningful business events rather than relying only on manual checks.
 - **Concurrency control** — locking and queueing patterns reduce race conditions in shared systems.
+- **Idempotent recovery** — interrupted local processing is repaired from known state without duplicating complete records.
+- **Schema-aware migration** — canonical fields, aliases and preflight checks keep workbook changes from silently shifting business logic.
 - **Config-driven architecture** — operational settings are moved out of code where appropriate, so non-technical users can maintain parts of the process safely.
-- **Failure-aware design** — fallback paths, retry handling and audit logs make issues easier to detect and recover from.
+- **Failure-aware design** — fallback paths, retry boundaries and audit logs make issues easier to detect and recover from.
 - **Privacy-conscious workflows** — sensitive content is kept out of broad notification channels where possible.
