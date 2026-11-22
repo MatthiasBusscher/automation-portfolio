@@ -42,8 +42,8 @@ Administration-specific authentication and routing. Every API call must target t
 - One name in the CRM produces a matching data structure across the required finance administrations.
 - The correct object code is available in each required administration from day one, so downstream financial allocation works without manual correction.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
-- The domino chain's state lives in CRM fields, so a human clearing or editing those fields can re-trigger or break the chain — guard conditions mitigate but don't eliminate this. With more flows, I'd introduce an explicit orchestration/state layer.
+- The domino chain's state lives in CRM fields, protected by guard conditions against accidental re-triggers. With more flows, an explicit orchestration/state layer is the next step.
 - Renaming an object after creation doesn't propagate to Exact — confirmed create-once; the flow is chained off initial debtor creation and has no update trigger, so renames in the CRM don't reach Exact.
 - Failure visibility relied on Make's error handling, which wrote a diagnostic note to the Pipedrive deal identifying exactly which step broke — making the failure visible in the CRM and the deal manually retryable. For a finance-critical chain I'd now add proactive alerting rather than waiting for someone to notice the note.

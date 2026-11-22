@@ -92,7 +92,7 @@ A second challenge was keeping GitHub aligned with the deployed source. Google A
 - Direct changes outside the intended Git workflow could be surfaced through scheduled integrity checks.
 - The reusable-workflow pattern was later applied to another deployment environment.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - The initial framework focused primarily on standardized deployment. A more mature version would add automated linting, tests and configuration validation before publishing.
 - Shared workflows were consumed from a moving branch. I would introduce versioned workflow releases so project repositories could upgrade deliberately without immediately inheriting breaking changes.

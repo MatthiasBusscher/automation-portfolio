@@ -103,7 +103,7 @@ This reduced duplicated logic while allowing new forms and follow-up requirement
 - New form routes could be introduced without recreating the entire downstream CRM workflow.
 - Deployment of form-specific changes became easier to maintain because shared CRM behaviour remained centralized.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - **Email remained the primary match key.** A stronger identity-resolution layer could also use normalized company domains and organization names, with manual review for uncertain matches.
 

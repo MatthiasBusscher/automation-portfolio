@@ -40,7 +40,7 @@ Getting the PDF rendering production-quality. The Drive export endpoint takes a 
 - External stakeholders receive a consistently formatted PDF in a professional HTML email every day — feedback confirmed they were happy to receive a clear, consistent report rather than the irregular output they'd seen before.
 - Misdirected-report risk is reduced by construction.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Recipients being hardcoded means a stakeholder change requires a script edit — the right fix is a protected config range (the pattern used in the [document management app](11-document-management-app.md)), keeping the no-field-user-access property while making changes self-service for supervisors.
 - One sheet serves one site; only one location was in production, though the architecture (data sheet + script) is designed to replicate easily to additional sites by copying the template.

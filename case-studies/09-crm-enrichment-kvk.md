@@ -39,8 +39,8 @@ The SBI data shape. The basisprofiel returns activities as a nested array of var
 - Multi-activity companies get complete, readable industry profiles in the CRM, improving segmentation.
 - API usage is strictly proportional to actual data changes.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Enrichment is one-shot: a company that relocates or renames after enrichment keeps stale data until someone re-touches the KvK field. A periodic re-validation sweep over active customers would close this.
-- No handling for KvK numbers that return no result (typo'd or deregistered) beyond a silent skip — the CRM fields simply aren't updated. A visible "enrichment failed" flag on the org would make failures actionable by sales.
-- Overwrite semantics are right for registry fields but the field list needs discipline — adding a non-registry field to the mapping later would silently destroy manual data.
+- KvK numbers that return no result (a typo or a deregistered company) leave the CRM fields unchanged. A visible "enrichment failed" flag on the organization, so sales can act on it, is the planned next step.
+- The mapping is deliberately limited to registry-owned fields, so manually entered data in other fields is never overwritten.

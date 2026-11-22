@@ -42,7 +42,7 @@ Safe structural deletion. Removing "the element containing this placeholder" is 
 - Drafting time per addendum is reduced through form-driven generation.
 - Template management is centralized: template owners edit once, with changes available to the relevant users.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Templates and code share a contract (placeholder naming, element structure around optional clauses); a legal editor restructuring a template can break generation. A template-validation script that lints templates against the expected placeholders would catch this before production — no breakage occurred in practice, but the risk is real whenever a template is structurally edited.
 - Generation feeds directly into an e-signature integration — the produced document goes into a signing flow without a manual handoff. The full loop from form input to executed, signed contract is automated end-to-end.

@@ -49,7 +49,7 @@ Designing the config schema so non-technical staff could *safely* hold the keys.
 - Follow-up on critical government correspondence is structurally faster: tagged actions surface in the morning digest until handled.
 - Invalid logbook entries are impossible by construction (config-synced validation).
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Owner recognition depends on filename conventions; misnamed files need manual correction in the logbook. An OCR/content-based classifier would remove the convention dependency — at significant complexity cost.
 - The scheduled sweep is polling; fine at this volume, but Drive push notifications (via a small web app endpoint) would be the cleaner trigger at larger scale.

@@ -38,7 +38,7 @@ Honestly, the implementation was the easy part — Make's own API had a list-sce
 - The process runs autonomously with minimal recurring effort or monitoring.
 - The organization's automation logic is now stored as portable plain-text artifacts outside the platform that runs it.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - **Connections and credentials are not in the blueprints.** A restored scenario must be re-linked to its app connections manually — the backup covers logic, not secrets. This is documented, but a restore-runbook with the connection mapping would shorten real recovery further.
 - Monthly granularity means up to a month of scenario changes can be lost; acceptable here, but the cadence is a single constant to change.

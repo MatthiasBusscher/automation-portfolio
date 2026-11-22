@@ -40,8 +40,8 @@ Field mapping at the boundary of two systems with different data models — maki
 - Significant API and platform load avoided by the push architecture — no polling overhead at all.
 - No duplicate debtors; CRM and bookkeeping stay linked 1-to-1 via the written-back debtor number.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
-- The dedupe check matches on KvK number first, falling back to company name if no KvK is present; a company that changed legal names or KvK numbers could slip through as a new debtor.
+- Duplicate detection matches on KvK number first, with company name as a fallback. A company that changes both its legal name and KvK number is a rare edge case that finance handles; matching on additional identifiers is the next refinement.
 - Updates after creation are out of scope: if the address changes in the CRM later, the WeFact debtor isn't updated automatically — confirmed, address sync is handled separately — a candidate for the same upsert treatment as the product sync.
 - Today I'd add an idempotency guard on the webhook itself (Pipedrive can re-fire on automation edits), though the exists-check already makes a duplicate create harmless.

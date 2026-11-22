@@ -55,7 +55,7 @@ The hardest part was defining safe behavior for every interruption point while p
 - Old and migrated workbook layouts can be validated through the same canonical schema layer.
 - Month-end date arithmetic and weekly, four-weekly, monthly, quarterly and annual frequencies follow one shared implementation.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Sheets remains the datastore. Locking and validation reduce risk, but there are still no transactions, foreign keys or atomic multi-record commits. A relational database with an API and durable job queue is the long-term architecture.
 - The preflight and parity audit provide broad migration coverage, but the pure calculation and state-transition functions still need automated unit tests. Duplicate-environment acceptance testing remains necessary before production rollout.

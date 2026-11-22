@@ -42,8 +42,8 @@ The transform step. The CRM returns deal products as nested API resources that m
 - Supporting documents are archived alongside the related handover data where required.
 - Handover lead time is shortened by moving routine transfer steps into the workflow.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
-- Silent gatekeeping is correct but opaque: a deal stuck missing one ID looks identical to a deal nobody won. No "blocked deals" digest was built — this remains a real operational gap where a digest would add meaningful visibility.
+- Silent gatekeeping is correct but opaque: a deal stuck missing one ID looks identical to a deal nobody won. A "blocked deals" digest is the logical next addition to make those deals visible.
 - JSON-in-a-cell trades queryability for schema stability — fine as a transport format, but it makes the staging tab itself unreadable to humans; a small rendered preview column would have helped support.
 - Changes to a deal *after* handover (upsells, corrections) were confirmed out of scope and handled manually — the natural next iteration is an update event alongside the create event.
