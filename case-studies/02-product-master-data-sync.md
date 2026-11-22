@@ -55,8 +55,8 @@ The reference data was relocated into the product database. Product groups now l
 
 **What I'd add:** validation on the category code (check against an allowed list) so a typo in the sheet can't pass an invalid group through the sync.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
-- The sync is one-directional. If someone edits a product directly in Pipedrive or WeFact, the change silently diverges until the next sync overwrites it there's no conflict detection. Locking down edit rights in the consumer systems was the pragmatic mitigation.
+- The sync is one-directional by design: the product database is the master. Edit rights in Pipedrive and WeFact are locked down so products can't drift away from it.
 - Deletions or setting products to inactive was currently out of scope.
-- Today I would add a periodic reconciliation run (compare master against consumers, report drift) as a safety net under the event-driven sync.
+- Next step: a periodic reconciliation run (compare master against consumers, report any drift) as an extra safety net under the event-driven sync.

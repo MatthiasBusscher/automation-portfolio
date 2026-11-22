@@ -43,8 +43,8 @@ Matching reminders to their originals. A dunning letter references its invoice l
 - Incoming invoices reach both the accounting workflow and the payment list, with correct links and less manual entry.
 - Action-level traceability is improved through timestamped system logging.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Classification inherits the filename-convention dependency; a supplier changing naming silently shifts documents to the manual route (safe, but unautomated).
 - Multi-invoice reminders would need explicit handling; the matching logic is designed for one reminder against one original invoice.
-- Today, LLM-based document extraction has changed this trade-off — content-level parsing is now cheap enough that I'd classify on extracted fields (sender, invoice number, document type) rather than filenames, removing the convention dependency entirely. This is precisely the upgrade explored in my AI engineering roadmap.
+- Today, LLM-based document extraction has changed this trade-off — content-level parsing is now cheap enough that I'd classify on extracted fields (sender, invoice number, document type) rather than filenames, removing the convention dependency entirely.

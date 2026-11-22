@@ -39,7 +39,7 @@ Address string sanitization. The pipeline is only as good as its match rate, and
 - m² figures come from the official Kadaster/BAG registration, eliminating guesswork-driven margin loss on operational delivery.
 - Messy address input self-corrects: the normalization layer makes the lookup robust against the inconsistencies that previously broke manual searches.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - **Registered ≠ serviceable area.** BAG area covers the verblijfsobject's usable floor space; multi-tenant buildings, partial rentals, or outdoor areas need human judgment. The automation sets the default; calculators can override by typing an m² value directly into the field — the enriched value is not locked.
 - Addresses resolving to multiple verblijfsobjecten (business parks, large complexes) result in no data being written — the m² field is left empty rather than silently setting a potentially wrong value. A review flag for multi-match cases would be the right next step.

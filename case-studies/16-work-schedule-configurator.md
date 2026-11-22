@@ -24,7 +24,7 @@ The sheet behaves like a cascading configurator: each selection clears the level
 
 ## Key decisions & trade-offs
 
-- **Sheets as the app platform.** The honest comparison wasn't "Sheets vs. a nice web app" but "Sheets vs. no tool this quarter." Sheets avoided separate hosting and login management, and gave users a UI they already trusted. The trade-off: building UI behavior (cascading filters, dynamic controls) on a platform with no native support for it — which is exactly where the engineering interest lies.
+- **Sheets as the app platform.** A deliberate choice: Sheets needed no separate hosting or login management, gave users a UI they already trusted, and could be delivered in weeks instead of months. The trade-off: building UI behavior (cascading filters, dynamic controls) on a platform with no native support for it — which is exactly where the engineering interest lies.
 - **Validity by construction, not validation after.** The UI renders only valid options, so invalid combinations are hard to produce rather than merely rejected later. This moves the source matrix into the role of single source of truth and reduces the review burden on output documents.
 - **`CacheService` between the UI and the source database.** Reading thousands of matrix rows on every click would make the interaction unusable. Caching the dataset in script cache turns each cascade step into an in-memory filter — the difference between a "tool" and a "toy."
 - **Undo via stored rollback coordinates.** The last export's target coordinates are stored, so a wrong push into an output template is reversible without a manual cleanup in a delivery document. Small feature, outsized trust effect: people use a push button much more freely when there's an undo.
@@ -41,8 +41,8 @@ Performance under GAS's interaction model. Every edit-trigger call pays trigger-
 - The interface responds quickly enough for practical daily use.
 - Faulty exports are recoverable in one click without damaging output files.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - `CacheService` has size/TTL limits and the dataset had to be partitioned across multiple cache keys to fit — and a matrix update mid-cache-window serves stale options until expiry.
 - The configurator handles composition only — which items and actions apply to an area type. Quantities, frequencies, and commercial calculations were out of scope and handled in a separate step.
-- This is the project where Sheets-as-platform reached its ceiling: today, with my fullstack training, this is the first tool I'd rebuild as a small web app (the cascading-filter logic ports directly to React state) — while keeping the source matrix in Sheets where the team maintains it.
+- This is the project where Sheets-as-platform reached its ceiling: if the tool grows further, the next step is a small web app (the cascading-filter logic ports directly to React state) — while keeping the source matrix in Sheets where the team maintains it.

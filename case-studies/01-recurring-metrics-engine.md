@@ -51,7 +51,7 @@ The hardest part was changing the metric model without corrupting the historical
 - Both legacy and migrated metric layouts remain usable during the transition.
 - Expansion and inferred churn are reported separately in the current layout.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Expansion is identified from contract start dates, and churn is inferred from aggregate movement. Neither replaces contract-level movement events or a true customer-cohort retention model.
 - Historical backfills reuse each record's current lifecycle status. A contract that has since ended may therefore be absent from a month in which it was active; reliable backdating would require status-effective dates or an event ledger.

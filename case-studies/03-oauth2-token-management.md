@@ -39,8 +39,8 @@ The initial token capture. The first refresh token issued during app authorizati
 - No hardcoded tokens anywhere; credentials live in one access-restricted store.
 - Manual re-authentication effort was reduced; token management requires less recurring attention.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - The Data Store is not a true secret manager: values are visible to anyone with sufficient Make organization access, and there's no rotation audit log. For a larger team I'd move secrets to a dedicated store and have Make fetch them at runtime.
-- Single point of failure by design: if the rotation scenario itself errors (e.g. Exact maintenance during the scheduled run), the chain can still die. A retry-with-alerting wrapper is the natural next hardening step.
+- Single point of failure by design: if the rotation scenario itself errors (e.g. Exact maintenance during the scheduled run), the chain stops. A retry-with-alerting wrapper is the natural next hardening step.
 - The pattern is Exact-specific in its constants but generic in shape it's the basis for a planned open-source template.

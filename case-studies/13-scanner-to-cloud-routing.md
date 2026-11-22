@@ -41,7 +41,7 @@ The storage-platform ownership block itself — because it's *intermittent*. The
 - Burst scans process with fewer crashes or double-handling issues, thanks to lock-serialized, rate-paced execution.
 - Forms the intake layer for the rest of the document ecosystem: files arrive pre-sorted where the HR, logbook, and AP automations read.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - **The fallback changes the file ID** (a copy is a new file). Anything that captured a link to the original before routing breaks. Downstream systems here pick files up *after* routing so it's safe, but it's a real constraint to document for reuse.
 - Routing fidelity depends on humans pressing the right button; there's no content verification. The automation follows the selected destination, but a human dragging a file to the wrong folder manually bypasses it entirely.

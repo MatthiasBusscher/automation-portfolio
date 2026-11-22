@@ -41,7 +41,7 @@ Making the audit trail useful enough for internal review. A spreadsheet-based lo
 - A reviewable audit trail exists for processed documents: who marked them handled, and when.
 - Processed documents are archived automatically under stricter permissions, keeping intake folders clean and access minimal.
 
-## Limitations & what I'd do differently
+## Scope & next steps
 
 - Active-user detection is reliable within a managed workspace domain, but the audit trail lives in a spreadsheet — strong for internal accountability, weaker as forensic evidence than an append-only external log.
 - "Read" is recorded; *opening the file itself* is not (that's Drive's own activity log) — the two would ideally be correlated.
